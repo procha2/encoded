@@ -50,6 +50,22 @@ For issues see [Snovault OSX App Installation][] first.
     $ ./circle-tests.sh npm
     ```
 
+## Configuration Installation (In Progress)
+    The configuration repo is set by 'conf_dir = ./cloud-config' in the 'dev-config.ini' file.  The
+    'deploy.py' compiles yaml files from 'cloud-config' for use with aws instances.  There is a
+    very specific file structure at the moment.  We are working to generalize the use case.
+
+    To use a different directory for cloud configuration copy 'dev-config.ini' to '.dev-config.ini'.
+    Then change the conf_dir in the hidden file to your configuration directory.
+
+    'deploy.py' uses configuration in 'dev-config.ini:deployment' section.  Those are overwritten
+    by '.dev-config.ini:deployment' if it exists.  Currently command line arguments will be
+    overwritten by the ini files.  Eventauly that may be swtiched so the command line arguments
+    overwrite ini files.
+
+    For temporary backwards compatibility the default config repo is set to this repos cloud-config.
+    Eventually, the dev-config.ini will default to a demonstration configuration
+
 
 [Snovault OSX System Installation]: https://github.com/ENCODE-DCC/snovault/blob/master/README.md#system-installation-osx-catlina-10152
 [Snovault OSX App Installation]: https://github.com/ENCODE-DCC/snovault/blob/master/README.md#application-installation
