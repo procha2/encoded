@@ -7,8 +7,8 @@ import multiprocessing as mp
 
 EPILOG = __doc__
 
-_HGNC_FILE = 'https://www.encodeproject.org/files/ENCFF623FUK/@@download/ENCFF623FUK.tsv'
-_MOUSE_FILE = 'https://www.encodeproject.org/files/ENCFF097CIT/@@download/ENCFF097CIT.tsv'
+_HGNC_FILE = 'https://www.encodeproject.org/files/ENCFF650OFD/@@download/ENCFF650OFD.tsv'
+_MOUSE_FILE = 'https://www.encodeproject.org/files/ENCFF521ODJ/@@download/ENCFF521ODJ.tsv'
 _DM_FILE = 'https://www.encodeproject.org/files/ENCFF311QAL/@@download/ENCFF311QAL.tsv'
 _CE_FILE = 'https://www.encodeproject.org/files/ENCFF324UJT/@@download/ENCFF324UJT.tsv'
 _ENSEMBL_URL = 'http://rest.ensembl.org/'

@@ -16,10 +16,10 @@ How to update the annotations versions
 
 1. Annotation files to use:
 	
-	* Human (HGNC file): tsv using ENCODE Portal Gene Object [Encode Portal Gene]
+	* Human (HGNC file): tsv using HGNC [HUGO Gene Nomenclature Committee HGNC ID (HGNC)]
 	* Mouse (Mouse file): tsv using MGI [Mouse Genome Informatics (MGI)]
 
-2. Archive the old annotation files used to generate the prior ```annotations.json``` . The archived file should have a *superseded_by* value for the new file that replaces it.
+2. Archive the old annotation files in the reference fileset [ENCSR763ATQ] used to generate the prior ```annotations.json``` . The archived file should have a *superseded_by* value for the new file that replaces it.
 
 3. Update the path to new tsv files uploaded on portal in [generate_annotations.py]
 
@@ -49,13 +49,17 @@ How to update the annotations versions
     
     Site release version: 92
     annotations.json file: annotations-2019-10-18.json
-    [Ensembl release date]: 2019-09-26
+    [Ensembl release date]: 2020-08-20
+	[MGI release date]: 2020-03-09
+	[HGNC release date]: 2020-09-02
 
 [Ensembl Gene ID (Ensembl)]: http://ensembl.org/
 [Entrez Gene ID (NCBI)]: http://ncbi.nlm.nih.gov/gene/
 [HUGO Gene Nomenclature Committee HGNC ID (HGNC)]: http://genenames.org
 [Mouse Genome Informatics (MGI)]: http://informatics.jax.org
-[Encode Portal Gene]: http://encodeproject.org/search/?type=Gene
+[ENCSR763ATQ]: http://www.encodeproject.org/references/ENCSR763ATQ/
 [buildout.cfg]: ../../../buildout.cfg
 [generate_annotations.py]: ../../../src/encoded/commands/generate_annotations.py
 [Ensembl release date]: http://ensembl.info
+[MGI release date]: http://informatics.jax.org/mgihome/other/mgicron.shtml
+[HGNC release date]: http://www.genenames.org/download/statistics-and-files/
