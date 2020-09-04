@@ -24,22 +24,26 @@ How to update the annotations versions
 3. Update the path to new tsv files uploaded on portal in [generate_annotations.py]
 
 4. Run generate-annotations on demo machine as encoded user:
-
-	$ cd encoded/srv/encoded/
-	$ sudo -su encoded
-	$ bin/generate-annotations development.ini --app-name app
+```
+cd encoded/srv/encoded/
+sudo -su encoded
+bin/generate-annotations development.ini --app-name app
+```
 
 5. Transfer ```annotations_local.json``` to local machine:
-
-	$ scp ubuntu@PublicDNS(IPv4):/srv/encoded/annotations_local.json annotations_local.json
+```
+scp ubuntu@PublicDNS(IPv4):/srv/encoded/annotations_local.json annotations_local.json
+```
 
 6. Rename the ```annotations_local.json``` to one with the date that it was generated:
-
-	$ cp annotations_local.json annotations_YYYY_MM_DD.json
+```
+cp annotations_local.json annotations_YYYY_MM_DD.json
+```
 
 7. Load new annotations file into the encoded-build/annotations directory on S3
-
-	$ aws s3 cp annotations_YYYY_MM_DD.json s3://encoded-build/annotations/
+```
+aws s3 cp annotations_YYYY_MM_DD.json s3://encoded-build/annotations/
+```
 
 8.  Update the annotations version in the [buildout.cfg]:
 
