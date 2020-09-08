@@ -56,11 +56,12 @@ For issues see [Snovault OSX App Installation][] first.
     very specific file structure at the moment.  We are working to generalize the use case.
 
     To use a different directory for cloud configuration copy 'dev-config.ini' to '.dev-config.ini'.
-    Then change the conf_dir in the hidden file to your configuration directory.
+    Then change the 'conf_dir=../your-conf-repo/cloud-config' in the hidden file to your 
+    configuration directory.
 
     'deploy.py' uses configuration in 'dev-config.ini:deployment' section.  Those are overwritten
     by '.dev-config.ini:deployment' if it exists.  Currently command line arguments will be
-    overwritten by the ini files.  Eventauly that may be swtiched so the command line arguments
+    overwritten by the ini files.  Eventaully that may be swtiched so the command line arguments
     overwrite ini files.
 
     For temporary backwards compatibility the default config repo is set to this repos cloud-config.
