@@ -1,13 +1,8 @@
 #!/bin/bash
 # Setup encoded app environment
-echo -e "\n$ENCD_INSTALL_TAG $(basename $0)"
+echo -e "\n$(basename $0) Running"
 
-# Check previous failure flag
-if [ -f "$encd_failed_flag" ]; then
-    echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) Skipping: encd_failed_flag exits"
-    exit 1
-fi
-echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) Running"
+standby_mode='off'
 
 # Script Below
 # Create encoded user home
@@ -27,9 +22,10 @@ sudo -H -u encoded "$ENCD_PY3_PATH" -m venv "$encd_venv"
 source "$encd_venv/bin/activate"
 sudo -H -u encoded "$encd_venv/bin/pip" install --upgrade pip setuptools
 sudo -H -u encoded "$encd_venv/bin/pip" install -r requirements.txt
-if [ $? -gt 0 ]; then
-    echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) ENCD FAILED: Penv install failed"
-    # Build has failed
-    touch "$encd_failed_flag"
-    exit 1
-fi
+
+cd $ENCD_SCRIPTS_DIR
+java.sh
+elasticsearch.sh
+wait-es-status.sh
+postgres-wale.sh "$standby_mode"
+wait-pg-status.sh

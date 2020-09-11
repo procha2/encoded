@@ -4,7 +4,7 @@ echo -e "$(basename $0) Running"
 
 # Script Below
 CLOUDWATCHMON_HOME='/opt/cloudwatchmon'
-CLOUDWATCHMON_REQS='app-cloudwatchmon-pyreqs.txt'
+CLOUDWATCHMON_REQS='cloudwatchmon-pyreqs.txt'
 CLOUDWATCHMON_VENV="$CLOUDWATCHMON_HOME/.cwm-pyenv"
 
 sudo mkdir "$CLOUDWATCHMON_HOME"

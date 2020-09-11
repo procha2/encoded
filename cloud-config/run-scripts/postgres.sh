@@ -2,24 +2,10 @@
 # Setup postgres 9.3 or 11,
 #   install wal-e,
 #   run backup fetch
-echo -e "\n$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0)"
+echo -e "\n$(basename $0) Running"
 
-# Check previous failure flag
-if [ -f "$encd_failed_flag" ]; then
-    echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Skipping: encd_failed_flag exits"
-    exit 1
-fi
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Running"
-
-# Script Below
-if [ "$ENCD_BUILD_TYPE" == 'app' ] || [ "$ENCD_BUILD_TYPE" == 'app-es' ]; then
-    echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Skipping install for no pg build"
-    exit 0
-fi
 standby_mode="$1"
 
-
-### Variables
 AWS_CREDS_DIR='/var/lib/postgresql/.aws'
 AWS_PROFILE='default'
 
@@ -31,11 +17,9 @@ WALE_DIR='/opt/pg-wal-e'
 WALE_VENV="$WALE_DIR/.pyenv-wal-e"
 WALE_BIN="$WALE_VENV/bin"
 WALE_ENV='/etc/wal-e.d/env'
-WALE_REQS_SRC="$ENCD_SCRIPTS_DIR/app-pg-wale-pyreqs.txt"
-WALE_REQS_DST="$WALE_DIR/app-pg-wale-pyreqs.txt"
+WALE_REQS_SRC="$ENCD_SCRIPTS_DIR/wale-pyreqs.txt"
+WALE_REQS_DST="$WALE_DIR/wale-pyreqs.txt"
 
-
-### Functions
 function copy_with_permission {
     src_file="$1/$3"
     dest_file="$2/$3"
@@ -51,30 +35,11 @@ function append_with_user {
     echo "$line" | sudo -u $user tee -a $dest
 }
 
-
-### Configure
-
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Setup aws keys for wal-e"
-
 # Downlaod postgres demo aws keys
 pg_keys_dir='/home/ubuntu/pg-aws-keys'
 mkdir "$pg_keys_dir"
 aws s3 cp --region=us-west-2 --recursive s3://encoded-conf-prod/pg-aws-keys "$pg_keys_dir"
-if [ ! -f "$pg_keys_dir/credentials" ]; then
-    echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) ENCD FAILED: ubuntu home pg aws creds"
-    # Build has failed
-    touch "$encd_failed_flag"
-    exit 1
-fi
-
-## Copy postgres aws to home
 pg_keys_dir='/home/ubuntu/pg-aws-keys'
-if [ ! -f "$pg_keys_dir/credentials" ]; then
-    echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) ENCD FAILED: ubuntu home pg aws creds"
-    # Build has failed
-    touch "$encd_failed_flag"
-    exit 1
-fi
 sudo -u root mkdir /var/lib/postgresql/.aws
 sudo -u root cp /home/ubuntu/pg-aws-keys/* ~postgres/.aws/
 sudo -u root chown -R postgres:postgres /var/lib/postgresql/.aws/
@@ -84,7 +49,6 @@ sudo -u postgres mkdir /var/lib/postgresql/.ssh
 sudo -u root cp /home/ubuntu/.ssh/authorized_keys /var/lib/postgresql/.ssh/authorized_keys
 sudo -u root chown -R postgres:postgres /var/lib/postgresql/.ssh/
 
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Setup postgres configuration"
 ## Copy pg confs from encoded repo to pg conf dir
 for filename in 'custom.conf' 'demo.conf' 'master.conf' 'recovery.conf'; do
     copy_with_permission "$PG_CONF_SRC" "$PG_CONF_DEST" "$filename"
@@ -133,13 +97,13 @@ fi
 
 
 ### Create db
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Create encode db"
+echo -e "$(basename $0) Create encode db"
 sudo -u postgres createuser encoded
 sudo -u postgres createdb --owner=encoded encoded
 
 
 ### Wale-E
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Install wal-e"
+echo -e "$(basename $0) Install wal-e"
 ## Create Wal-e ENV - python3 only
 sudo -u root mkdir -p "$WALE_ENV"
 sudo -u root chown postgres:postgres "$WALE_ENV"
@@ -166,7 +130,7 @@ sudo -u postgres git clone https://github.com/wal-e/wal-e.git "$WALE_DIR/wal-e"
 sudo -H -u postgres "$WALE_BIN/pip" install -e "$WALE_DIR/wal-e"
 
 ### Postgres
-echo -e "\n\t$APP_WRAPPER$ENCD_INSTALL_TAG $(basename $0) Do initial wal-e backup-fetch"
+echo -e "$(basename $0) Do initial wal-e backup-fetch"
 ## Update db from wale backup
 sudo -u postgres pg_ctlcluster 11 main stop
 sudo -u postgres "$WALE_BIN/envdir" "$WALE_ENV" "$WALE_BIN/wal-e" backup-fetch "$PG_DATA" LATEST
@@ -180,7 +144,3 @@ sudo -u postgres pg_ctlcluster 11 main start
 
 ## Wait for psql to come up
 $ENCD_SCRIPTS_DIR/app-pg-status.sh
-if [ -f "$encd_failed_flag" ]; then
-    echo -e "\n\t$ENCD_INSTALL_TAG $(basename $0) ENCD FAILED: App pg status"
-    exit 1
-fi

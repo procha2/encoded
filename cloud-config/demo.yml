@@ -89,31 +89,24 @@ power_state:
 output:
   all: '| tee -a /var/log/cloud-init-output.log'
 runcmd:
-- cloud-init-per once conf-encd-pem-s3 sudo -u ubuntu aws s3 cp --region=us-west-2 s3://encoded-conf-prod/encd-pems/encoded-demos.pem /home/ubuntu/.ssh/encoded-demos.pem
-- cloud-init-per once conf-encd-pem-chmod sudo -u ubuntu chmod 0600 /home/ubuntu/.ssh/encoded-demos.pem
-- cloud-init-per once conf-encd-cfg-s3 sudo -u ubuntu aws s3 cp --region=us-west-2 s3://encoded-conf-prod/encd-pems/config /home/ubuntu/.ssh/config
-- cloud-init-per once conf-encd-cfg-chmod sudo -u ubuntu chmod 0600 /home/ubuntu/.ssh/config
-- cloud-init-per once conf-git-repo sudo -u ubuntu git clone git@github.com:ENCODE-DCC/encode-private-config.git /home/ubuntu/encode-private-config
-- cloud-init-per once conf-git-branch sudo -u ubuntu git -C /home/ubuntu/encode-private-config checkout -b encode-private-config origin/master
+# AWS KEYS
+- cloud-init-per once conf-encd-pem-s3 sudo -u ubuntu aws s3 cp --region=us-west-2 %(private_key_pem_src)s %(private_key_pem_dest)s
+- cloud-init-per once conf-encd-pem-chmod sudo -u ubuntu chmod 0600 %(private_key_pem_dest)s
+- cloud-init-per once conf-encd-cfg-s3 sudo -u ubuntu aws s3 cp --region=us-west-2 %(private_key_config_src)s %(private_key_config_dest)s
+- cloud-init-per once conf-encd-cfg-chmod sudo -u ubuntu chmod 0600 %(private_key_config_dest)s
+# Deployment Repo
+- cloud-init-per once conf-git-repo sudo -u ubuntu git clone %(cnf_git_repo)s %(cnf_git_repo_dest)s
+- cloud-init-per once conf-git-branch sudo -u ubuntu git -C %(cnf_git_repo_dest)s checkout -b %(cnf_git_branch)s  %(cnf_git_remote)s/%(cnf_git_branch)s
+# System
 - cloud-init-per once libmagic-mgc-install wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-mgc_5.38-4_amd64.deb && sudo dpkg -i libmagic-mgc_5.38-4_amd64.deb && sudo apt-get install -yf
 - cloud-init-per once libmagic1-install wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic1_5.38-4_amd64.deb && sudo dpkg -i libmagic1_5.38-4_amd64.deb && sudo apt-get install -yf
 - cloud-init-per once libmagic-dev-install wget http://archive.ubuntu.com/ubuntu/pool/main/f/file/libmagic-dev_5.38-4_amd64.deb && sudo dpkg -i libmagic-dev_5.38-4_amd64.deb && sudo apt-get install -yf
 - cloud-init-per once libmagic-dev-install sudo apt --fix-broken install && sudo apt autoremove
-
-- cloud-init-per once nagios-monitor-install /usr/bin/sudo /usr/bin/apt-get -y install nagios-nrpe-plugin monitoring-plugins nagios-nrpe-server libjson-perl libmonitoring-plugin-perl liblwp-useragent-determined-perl sysstat
-- cloud-init-per once nagios-files-s3 aws s3 cp --region=us-west-2 --recursive s3://encoded-conf-prod/nagios-plugins /home/ubuntu/nagios-plugins
-- cloud-init-per once nagios-mv-conf mv /home/ubuntu/nagios-plugins/nrpe_local.cfg /etc/nagios/nrpe.d/nrpe_local.cfg
-- cloud-init-per once nagios-plugins-permission chmod -R 0755 /home/ubuntu/nagios-plugins
-- cloud-init-per once nagios-plugins mv /home/ubuntu/nagios-plugins/* /usr/lib/nagios/plugins/
-
-- cloud-init-per once encd-git-repo sudo -u ubuntu git clone %(git_repo)s /home/ubuntu/encoded
-- cloud-init-per once encd-git-branch sudo -u ubuntu git -C /home/ubuntu/encoded checkout -b %(git_branch)s %(git_remote)s/%(git_branch)s
-- cloud-init-per once encd-java sudo -u ubuntu %(cc_dir)s/run_scripts/ami-java.sh
-- cloud-init-per once encd-redis sudo -u ubuntu %(cc_dir)s/run_scripts/ami-redis.sh
-- cloud-init-per always encd-elasticsearch sudo -u ubuntu %(cc_dir)s/run_scripts/ami-elasticsearch.sh
-- cloud-init-per once encd-pre sudo -u ubuntu %(cc_dir)s/run_scripts/ami-preapp.sh
-- cloud-init-per always encd-app sudo -u ubuntu %(cc_dir)s/run_scripts/app-wrapper.sh %(batchupgrade_vars)s
-- cloud-init-per always encd-cloudwatch sudo -u ubuntu %(cc_dir)s/run_scripts/app-cloudwatchmon.sh
+# Application
+- cloud-init-per once encd-pre sudo -u ubuntu %(cc_dir)s/run_scripts/preapp.sh
+- cloud-init-per always encd-app sudo -u ubuntu %(cc_dir)s/run_scripts/encoded.sh
+# Monitoring
+- cloud-init-per always encd-cloudwatch sudo -u ubuntu %(cc_dir)s/run_scripts/cloudwatchmon.sh
 users:
 - default
 - name: build
@@ -139,9 +132,6 @@ write_files:
 - path: /etc/environment
   append: true
   content: |
-    encd_do_install_flag=/home/ubuntu/.encd_do_install_flag
-    encd_is_installed_flag=/home/ubuntu/.encd_is_installed_flag
-    encd_failed_flag=/home/ubuntu/.encd_failed_flag
     encd_app_workers=%(app_workers)s
     encd_batchupgrade=%(batchupgrade)s
     encd_batchupgrade_vars='%(batchupgrade_vars)s'

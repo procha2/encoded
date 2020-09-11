@@ -22,7 +22,7 @@ DEFAULT_CONF_DIR = f"{str(Path().parent.absolute())}"
 def _get_bdm(volume_size):
     allowed_values = ['120', '200', '500']
     if not volume_size.isdigit() or volume_size not in allowed_values:
-        print(f"Volume size must be {allowed_valus}")
+        print(f"Volume size must be {allowed_values}")
         return None
     return [
         {
@@ -172,8 +172,9 @@ def main():
 
     # Instance Args 
     aws_instance = conf_dict['aws_instance']
-    aws_instance['bdm'] = _get_bdm(main_args.volume_size)
-    if aws_instance['bdm']:
+    aws_instance['bdm'] = _get_bdm(aws_instance['instance_volume_size'])
+    if aws_instance['bdm'] is None:
+        print('Failure: Could not get bdm')
         exit(1)
     aws_instance['instance_name'] = _nameify(f"{_short_name(branch)}-{commit}-{conf_dict['deployment']['username']}")
     aws_instance['user_data'] = user_data
