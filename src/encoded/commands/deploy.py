@@ -192,20 +192,25 @@ def main():
             {'Name': 'instance-state-name',
              'Values': ['pending', 'running', 'stopping', 'stopped']},
         ])):
-        print('An instance already exists with name: %s' % instances_tag_data['name'])
+        print('An instance already exists with name: %s' % aws_instance['instance_name'])
         exit(1)
     # Create 
-    instances = ec2_client.create_instances(
+    print('Deploying Demo')
+    instances = ec2.create_instances(
         BlockDeviceMappings=aws_instance['bdm'],
         IamInstanceProfile={"Name": aws_instance['iam_role']},
         ImageId=aws_instance['image_id'],
-        MinCount=aws_instance['instance_count'],
-        MaxCount=aws_instance['instance_count'],
+        MinCount=int(aws_instance['instance_count']),
+        MaxCount=int(aws_instance['instance_count']),
         InstanceType=aws_instance['instance_type'],
         InstanceInitiatedShutdownBehavior='terminate',
         KeyName=aws_instance['key_pair_name'],
         Placement={'AvailabilityZone': aws_instance['region_availability']},
-        SecurityGroups=aws_instance['security_groups'],
+        SecurityGroups=[
+            item
+            for item in aws_instance['security_groups'].split(',')
+            if item
+        ],
         UserData=aws_instance['user_data'],
     )
     if not instances:
@@ -240,13 +245,13 @@ def main():
     ]
     instances[0].create_tags(Tags=tags)
     # Wait
-    instance.wait_until_running()
+    instances[0].wait_until_running()
     # Console log
-    instance.load()
+    instances[0].load()
     print('Deploying Demo')
     print(f"https://{aws_instance['instance_name']}.demo.encodedcc.org")
-    print(f"ssh ubuntu@{instance.id}.instance.encodedcc.org")
-    print(f"ssh ubuntu@{instance.public_dns_name} 'tail -f /var/log/cloud-init-output.log'")
+    print(f"ssh ubuntu@{instances[0].id}.instance.encodedcc.org")
+    print(f"ssh ubuntu@{instances[0].public_dns_name} 'tail -f /var/log/cloud-init-output.log'")
 
 
 def _parse_args():
