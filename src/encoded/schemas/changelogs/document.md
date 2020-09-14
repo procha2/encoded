@@ -8,6 +8,7 @@
         "deleted",
         "released"
     ]
+* Added *plasmid map* as enum in *document_type*
 
 ### Schema version 7
 

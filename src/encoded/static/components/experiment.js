@@ -399,13 +399,26 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     }
 
     // Collect biosample docs.
+    // Collect plasmid maps from gm docs.
     let biosampleDocs = [];
+    let gmDocs = [];
     biosamples.forEach((biosample) => {
         biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample));
         if (biosample.part_of) {
             biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample.part_of));
         }
+        if (biosample.genetic_modifications && biosample.genetic_modifications.length > 0) {
+            //khine
+            gmDocs = biosample.genetic_modifications.documents;
+        } 
     });
+
+
+
+    biosamples.forEac
+    if (biosamples.genetic_modifications && biosample.genetic_modifications.length > 0) {
+
+    }
 
     // Collect pipeline-related documents.
     let analysisStepDocs = [];
