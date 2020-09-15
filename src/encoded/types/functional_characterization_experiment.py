@@ -75,6 +75,7 @@ class FunctionalCharacterizationExperiment(
         'replicates.libraries.biosample.organism',
         'replicates.libraries.biosample.donor',
         'replicates.libraries.biosample.donor.organism',
+        'replicates.libraries.biosample.genetic_modifications',
         'replicates.libraries.biosample.part_of',
         'replicates.libraries.biosample.part_of.donor',
         'replicates.libraries.biosample.part_of.treatments',

@@ -399,25 +399,20 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
     }
 
     // Collect biosample docs.
-    // Collect plasmid maps from gm docs.
     let biosampleDocs = [];
-    let gmDocs = [];
+    let plasmidMapDocs = [];
     biosamples.forEach((biosample) => {
         biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample));
         if (biosample.part_of) {
             biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample.part_of));
         }
         if (biosample.genetic_modifications && biosample.genetic_modifications.length > 0) {
-            //khine
-            gmDocs = biosample.genetic_modifications.documents;
-        } 
-    });
-
-
-
-    biosamples.forEac
-    if (biosamples.genetic_modifications && biosample.genetic_modifications.length > 0) {
-
+            biosample.genetic_modifications.forEach((gm) => {
+                if (gm.documents && gm.documents.length > 0) {
+                    plasmidMapDocs = plasmidMapDocs.concat(gm.documents);
+                }
+            });
+        }
     }
 
     // Collect pipeline-related documents.
@@ -872,6 +867,19 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
                         </PanelHeading>
                         <PanelBody addClasses="panel-body-doc-interior">
                             <DocumentsSubpanels documentSpec={{ documents: biosampleCharacterizations }} />
+                        </PanelBody>
+                    </Panel>
+                </div>
+            : null}
+
+            {plasmidMapDocs && plasmidMapDocs.length > 0 ?
+                <div>
+                    <Panel>
+                        <PanelHeading>
+                            <h4>Plasmid map</h4>
+                        </PanelHeading>
+                        <PanelBody addClasses="panel-body-doc-interior">
+                            <DocumentsSubpanels documentSpec={{ documents: plasmidMapDocs }} />
                         </PanelBody>
                     </Panel>
                 </div>
