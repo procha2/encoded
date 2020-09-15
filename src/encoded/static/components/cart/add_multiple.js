@@ -58,12 +58,6 @@ class CartAddAllSearchComponent extends React.Component {
             }
         });
 
-        // Add a partial filter entry for any types not included in the current search result
-        // filters.
-        allowedTypes.forEach((type) => {
-            queryFilters.push({ field: 'type', term: type });
-        });
-
         // Use the existing query plus any cartable object types to search for all @ids to add to
         // the cart.
         const searchQuery = `${queryFilters.map(element => (

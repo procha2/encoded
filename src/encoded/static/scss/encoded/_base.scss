@@ -15,6 +15,7 @@ $std-href-color:               #428bca;
 
 $site-font:                    'Mada', sans-serif;
 $brand-font:                   'Mada', sans-serif;
+$button-font:                  'Quicksand', sans-serif;
 
 $Homo-sapiens:                  #63326E;
 $Mus-musculus:                  #3D518C;
@@ -450,5 +451,13 @@ pre code {
                 }
             }
         }
+    }
+
+    @at-root #{&}__overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
     }
 }

@@ -171,7 +171,7 @@ const sortLookUp = (obj, param) => {
     case 'File type':
         return obj.file_type.toLowerCase();
     case 'Assay term name':
-        return obj.assay_term_name.toLowerCase();
+        return obj.assay_term_name && obj.assay_term_name.toLowerCase();
     case 'Biosample term name':
         return obj.biosample_ontology.term_name.toLowerCase();
     default:

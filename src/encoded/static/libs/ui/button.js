@@ -192,7 +192,7 @@ const useDropdownButton = () => {
  * Implements the immediate form of dropdown button, where selecting an item from the dropdown menu
  * immediately executes that item.
  */
-export const Immediate = ({ label, id, css, inline, children }) => {
+export const Immediate = ({ label, id, css, inline, disabledMessage, children }) => {
     const [state, actions] = useDropdownButton();
 
     // Wrap each child in an <li> element, as they will be children of a <ul>.
@@ -213,6 +213,7 @@ export const Immediate = ({ label, id, css, inline, children }) => {
                 onMouseLeave={actions.houseMouseLeave}
                 onFocus={actions.handleFocus}
                 onBlur={actions.handleBlur}
+                disabled={!!disabledMessage}
             >
                 {label}
             </button>
@@ -245,6 +246,8 @@ Immediate.propTypes = {
     css: PropTypes.string,
     /** True to make this an inline component */
     inline: PropTypes.bool,
+    /** Message to display in browser tooltip when disabled */
+    disabledMessage: PropTypes.string,
     /** Child components within in this component */
     children: PropTypes.node.isRequired,
 };
@@ -252,6 +255,7 @@ Immediate.propTypes = {
 Immediate.defaultProps = {
     css: '',
     inline: false,
+    disabledMessage: '',
 };
 
 
@@ -259,7 +263,7 @@ Immediate.defaultProps = {
  * Implements the selected form of the dropdown button, where items in the dropdown menu select the
  * action taken when the button is clicked.
  */
-export const Selected = ({ labels, execute, id, triggerVoice, css, inline, children }) => {
+export const Selected = ({ labels, execute, id, triggerVoice, css, inline, disabledMessage, children }) => {
     const [state, actions] = useDropdownButton();
 
     // Extract the id attributes of each of the child components.
@@ -287,7 +291,8 @@ export const Selected = ({ labels, execute, id, triggerVoice, css, inline, child
     return (
         <div className={`dropdown-button${css ? ` ${css}` : ''}`} style={inline ? { display: 'inline-flex' } : null}>
             <div className="dropdown-button__composite" onMouseEnter={actions.handleMouseEnter} onMouseLeave={actions.houseMouseLeave}>
-                <button className="dropdown-button__composite-execute" onClick={handleExecute} onKeyUp={actions.handleKey}>
+                {disabledMessage ? <div className="dropdown-button__overlay" title={disabledMessage} /> : null}
+                <button className="dropdown-button__composite-execute" onClick={handleExecute} onKeyUp={actions.handleKey} disabled={!!disabledMessage}>
                     {labels[selection]}
                 </button>
                 <button
@@ -299,6 +304,7 @@ export const Selected = ({ labels, execute, id, triggerVoice, css, inline, child
                     aria-label={triggerVoice}
                     onFocus={actions.handleFocus}
                     onBlur={actions.handleBlur}
+                    disabled={!!disabledMessage}
                 >
                     {svgIcon('chevronDown')}
                 </button>
@@ -332,6 +338,8 @@ Selected.propTypes = {
     css: PropTypes.string,
     /** True to make this an inline component */
     inline: PropTypes.bool,
+    /** Message to display in browser tooltip when disabled */
+    disabledMessage: PropTypes.string,
     /** Child components within in this component */
     children: PropTypes.node.isRequired,
 };
@@ -339,4 +347,5 @@ Selected.propTypes = {
 Selected.defaultProps = {
     css: '',
     inline: false,
+    disabledMessage: '',
 };
