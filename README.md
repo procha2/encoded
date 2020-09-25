@@ -28,7 +28,7 @@ For issues see [Snovault OSX App Installation][] first.
 
 1. Build Application
     ```
-    $ make clean && buildout bootstrap && bin/buildout
+    $ make clean && buildout bootstrap && bin/buildout -c development.cfg
     ```
 
 1. Run Application

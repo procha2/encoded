@@ -18,8 +18,10 @@
 /npm-shrinkwrap.json
 /ontology.json
 /parts/
-/base.ini
 /development.ini
+/demo.ini
+/rc.ini
+/test.ini
 /production.ini
 /session-secret.b64
 /src/encoded/static/css/
