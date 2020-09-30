@@ -3,6 +3,7 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
+    CONNECTION,
 )
 from pyramid.traversal import find_root
 from .base import (
@@ -232,10 +233,6 @@ class Library(Item):
 class Publication(Item):
     item_type = 'publication'
     schema = load_schema('encoded:schemas/publication.json')
-    rev = {
-        'publication_data': ('PublicationData', 'references'),
-        'datasets': ('Dataset', 'references')
-    }
 
     def unique_keys(self, properties):
         keys = super(Publication, self).unique_keys(properties)
@@ -254,40 +251,67 @@ class Publication(Item):
         else:
             return None
 
-    @calculated_property(schema={
-        "title": "Publication Data",
-        "type": "array",
-        "uniqueItems": True,
-        "items": {
-            "type": ['string', 'object'],
-            "linkFrom": "PublicationData.references",
-        },
-    })
-    def publication_data(self, request, publication_data):
-        return paths_filtered_by_status(request, publication_data)
+    @calculated_property(
+        category='page',
+        schema={
+            "title": "Publication Data",
+            "type": "array",
+            "uniqueItems": True,
+            "items": {
+                "type": ['string', 'object'],
+                "linkFrom": "PublicationData.references",
+            },
+        }
+    )
+    def publication_data(self, request):
+        uuids = self.registry[CONNECTION].get_rev_links(
+            self.model,
+            'references',
+            'PublicationData'
+        )
+        objects = (
+            request.embed('/',str(uuid), '@@object_with_select_calculated_properties?field=@id')
+            for uuid in uuids
+        )
+        return [
+            obj['@id']
+            for obj in objects
+            if obj['status'] not in ('deleted', 'replaced')
+        ]
 
-    @calculated_property(condition='datasets', schema={
-        "title": "Datasets",
-        "description": "The datasets referred to by the publication.",
-        "comment": "Do not submit, this is calculated using the references property on dataset objects.",
-        "type": "array",
-        "uniqueItems": True,
-        "notSubmittable": True,
-        "items": {
-            "type": ['string', 'object'],
-            "linkFrom":
-                "Dataset.references"
-        },
-    })
-    def datasets(self, request, datasets):
-        allowed_dataset_types = ["/experiments/",
-                                 "/functional-characterization-experiments/",
-                                 "/annotations/", "/references/"]
-        filtered = set()
-        for d in datasets:
-            if d.startswith(tuple(allowed_dataset_types)):
-                filtered.add(d)
-        return paths_filtered_by_status(request, filtered)
+    @calculated_property(
+        category='page',
+        schema={
+            "title": "Datasets",
+            "description": "The datasets referred to by the publication.",
+            "comment": "Do not submit, this is calculated using the references property on dataset objects.",
+            "type": "array",
+            "uniqueItems": True,
+            "notSubmittable": True,
+            "items": {
+                "type": ['string', 'object'],
+                "linkFrom": "Dataset.references"
+            },
+        }
+    )
+    def datasets(self, request):
+        uuids = self.registry[CONNECTION].get_rev_links(
+            self.model,
+            'references',
+            'Experiment',
+            'FunctionalCharacterizationExperiment',
+            'Annotation',
+            'Reference'
+        )
+        objects = (
+            request.embed('/', str(uuid), '@@object_with_select_calculated_properties?field=@id')
+            for uuid in uuids
+        )
+        return [
+            obj['@id']
+            for obj in objects
+            if obj['status'] not in ('deleted', 'replaced')
+        ]
 
 
 @collection(
