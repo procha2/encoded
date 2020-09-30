@@ -5,10 +5,10 @@ import _ from 'underscore';
 import url from 'url';
 import { Panel, PanelHeading, PanelBody } from '../libs/ui/panel';
 import { auditDecor } from './audit';
-import { DocumentsPanelReq, DocumentsSubpanels } from './doc';
+import { DocumentsPanelRenderer, DocumentsPanelReq, DocumentsSubpanels } from './doc';
 import * as globals from './globals';
 import { DbxrefList } from './dbxref';
-import { FetchedItems } from './fetched';
+import { FetchedItems, Param } from './fetched';
 import { FileGallery } from './filegallery';
 import { ProjectBadge } from './image';
 import { Breadcrumbs } from './navigation';
@@ -413,12 +413,16 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
         });
     }
 
-    // Collect biosample docs.
+    // Collect biosample docs and applied_modification docs
     let biosampleDocs = [];
+    let appliedModificationsDocs = [];
     biosamples.forEach((biosample) => {
         biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample));
         if (biosample.part_of) {
             biosampleDocs = biosampleDocs.concat(CollectBiosampleDocs(biosample.part_of));
+        }
+        if (biosample.applied_modifications && biosample.applied_modifications.length > 0) {
+            appliedModificationsDocs = biosample.applied_modifications.reduce((amDocs, am) => ((am.documents && am.documents.length > 0) ? amDocs.concat(am.documents) : amDocs), []);
         }
     });
 
@@ -904,6 +908,10 @@ const ExperimentComponent = ({ context, auditIndicators, auditDetail }, reactCon
 
             {combinedDocuments.length > 0 ?
                 <DocumentsPanelReq documents={combinedDocuments} />
+            : null}
+
+            {appliedModificationsDocs.length > 0 ?
+                <DocumentsPanelReq documents={appliedModificationsDocs} />
             : null}
         </div>
     );
