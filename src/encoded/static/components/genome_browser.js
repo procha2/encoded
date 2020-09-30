@@ -173,7 +173,7 @@ const sortLookUp = (obj, param) => {
     case 'Assay term name':
         return obj.assay_term_name && obj.assay_term_name.toLowerCase();
     case 'Biosample term name':
-        return obj.biosample_ontology.term_name.toLowerCase();
+        return obj.biosample_ontology && obj.biosample_ontology.term_name.toLowerCase();
     default:
         return null;
     }
